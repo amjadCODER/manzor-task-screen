@@ -1,28 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { DashboardData } from "@/types/dashboard";
 
 export function useDashboard(initialData: DashboardData) {
   const [data, setData] = useState(initialData);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    async function refresh() {
-      setIsRefreshing(true);
-      try {
-        const response = await fetch("/api/dashboard", { cache: "no-store" });
-        if (response.ok) {
-          setData(await response.json());
-        }
-      } finally {
-        setIsRefreshing(false);
-      }
+  const refresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const response = await fetch(`/api/dashboard?t=${Date.now()}`, { cache: "no-store" });
+      if (response.ok) setData(await response.json());
+    } catch (error) {
+      console.error("Failed to refresh dashboard", error);
+    } finally {
+      setIsRefreshing(false);
     }
-
-    const timer = window.setInterval(refresh, 15000);
-    return () => window.clearInterval(timer);
   }, []);
 
-  return { data, isRefreshing };
+  useEffect(() => {
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 5000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [refresh]);
+
+  return { data, isRefreshing, refresh };
 }

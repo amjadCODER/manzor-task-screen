@@ -154,3 +154,42 @@ select {
     min-height: 128px;
   }
 }
+
+/* تحسين مساحة الموظف على الجوال بدون تغيير منطق الشاشات القديمة */
+@media (max-width: 1023px) {
+  .employee-workspace-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .employee-entry-panel {
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .employee-mobile-form {
+    border-radius: 24px;
+    padding: 16px;
+  }
+
+  .employee-mobile-form input,
+  .employee-mobile-form textarea,
+  .employee-mobile-form select,
+  .employee-mobile-form button {
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  .employee-mobile-form textarea {
+    min-height: 104px;
+  }
+
+  .employee-mobile-form button[type="submit"],
+  .employee-mobile-form button:not([type]) {
+    position: sticky;
+    bottom: 10px;
+    z-index: 20;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.38);
+  }
+}

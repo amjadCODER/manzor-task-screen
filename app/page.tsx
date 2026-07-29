@@ -80,8 +80,9 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <button type="button" onClick={() => router.push("/monitor")} className="mt-5 text-sm font-bold text-cyan-200 underline underline-offset-4">
-          فتح شاشة المتابعة العامة
+        <button type="button" onClick={() => router.push("/monitor")} className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-5 py-4 text-sm font-black text-cyan-100 transition hover:bg-cyan-400/15">
+          <span aria-hidden="true">▣</span>
+          عرض شاشة المتابعة بدون تسجيل دخول
         </button>
       </section>
     </main>

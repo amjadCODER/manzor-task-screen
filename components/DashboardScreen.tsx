@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { DashboardData, Employee, EmployeeTask } from "@/types/dashboard";
 import { getTopEmployee, getTotals } from "@/lib/dashboard";
@@ -21,18 +21,21 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
   const [selected, setSelected] = useState<Employee | null>(null);
   const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
 
+  const refreshAllTasks = useCallback(async () => {
+    try {
+      const tasks = await getTasks();
+      setAllTasks(tasks.filter((task) => task.date === todayKey()));
+    } catch (error) {
+      console.error("Failed to load shared monitor tasks", error);
+    }
+  }, []);
+
   useEffect(() => {
     setActiveEmployeeId(localStorage.getItem("manzor_active_employee"));
-
-    const refreshLocal = () => setAllTasks(getTasks().filter((task) => task.date === todayKey()));
-    refreshLocal();
-    window.addEventListener("storage", refreshLocal);
-    window.addEventListener("manzor-data-updated", refreshLocal);
-    return () => {
-      window.removeEventListener("storage", refreshLocal);
-      window.removeEventListener("manzor-data-updated", refreshLocal);
-    };
-  }, []);
+    void refreshAllTasks();
+    const timer = window.setInterval(() => void refreshAllTasks(), 5000);
+    return () => window.clearInterval(timer);
+  }, [refreshAllTasks]);
 
   const employees = useMemo(() => data.employees.map((employee) => {
     const tasks = allTasks.filter((task) => task.employeeId === employee.id);
@@ -47,6 +50,11 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
 
   const topEmployee = getTopEmployee(employees);
   const totals = getTotals(employees);
+
+  function powerOffMonitor() {
+    localStorage.removeItem("manzor_active_employee");
+    router.replace("/");
+  }
 
   async function enterFullscreen() {
     try {
@@ -66,6 +74,7 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
         <div className="absolute left-4 top-4 z-40 flex gap-2">
           <button onClick={enterFullscreen} title="شاشة كاملة بالعرض" className="rounded-2xl border border-white/15 bg-black/35 px-3 py-2 text-sm font-black text-white backdrop-blur-xl">⛶</button>
           <button onClick={() => router.push(activeEmployeeId ? `/employee/${activeEmployeeId}` : "/")} title={activeEmployeeId ? "فتح مساحتي" : "دخول الموظف"} className="rounded-2xl border border-white/15 bg-black/35 px-3 py-2 text-sm font-black text-white backdrop-blur-xl">{activeEmployeeId ? "مساحتي" : "دخول"}</button>
+          <button onClick={powerOffMonitor} title="ايقاف شاشة المتابعة والرجوع للدخول" aria-label="ايقاف شاشة المتابعة" className="rounded-2xl border border-rose-300/20 bg-rose-400/10 px-3 py-2 text-base font-black text-rose-100 backdrop-blur-xl">⏻</button>
         </div>
 
         <section className="relative z-10 grid flex-1 grid-cols-1 gap-3 lg:grid-cols-12 xl:gap-4">
@@ -75,7 +84,7 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
         </section>
         <FooterStats {...totals} />
         <div className="pointer-events-none absolute bottom-4 left-5 z-20 rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[10px] font-bold text-slate-300 backdrop-blur-xl sm:text-xs">
-          {isRefreshing ? "جاري التحديث..." : "تحديث تلقائي كل 15 ثانية"}
+          {isRefreshing ? "جاري التحديث..." : "تحديث مباشر كل 5 ثوان"}
         </div>
       </section>
       {selected && <EmployeeTaskModal employee={selected} tasks={allTasks.filter((task) => task.employeeId === selected.id)} onClose={() => setSelected(null)} />}

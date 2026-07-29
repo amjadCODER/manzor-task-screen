@@ -18,7 +18,7 @@ export async function GET() {
 
   try {
     const response = await fetch(
-      `${url}/rest/v1/tasks?select=id,employee_id,title,priority,status,task_date,created_at,completed_at&task_date=eq.${todayKey()}&order=created_at.desc`,
+      `${url}/rest/v1/tasks?select=id,employee_id,title,priority,status,task_date,created_at&task_date=eq.${todayKey()}&order=created_at.desc`,
       { headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: "no-store" },
     );
 
@@ -31,7 +31,6 @@ export async function GET() {
       priority: EmployeeTask["priority"];
       status: EmployeeTask["status"];
       created_at: string;
-      completed_at: string | null;
     }>;
 
     const hydratedEmployees = employees.map((employee) => {
@@ -63,7 +62,7 @@ export async function GET() {
         id: task.id,
         title: task.title,
         employeeName: employees.find((item) => item.id === task.employee_id)?.name || task.employee_id,
-        completedAt: task.completed_at || task.created_at,
+        completedAt: task.created_at,
       }));
 
     return NextResponse.json({ employees: hydratedEmployees, currentTasks, completedTasks, updatedAt: new Date().toISOString() } satisfies DashboardData);
