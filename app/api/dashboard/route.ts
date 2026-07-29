@@ -5,7 +5,8 @@ import type { DashboardData, EmployeeTask } from "@/types/dashboard";
 export const dynamic = "force-dynamic";
 
 function todayKey() {
-  return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
+  const shifted = new Date(Date.now() - 8 * 60 * 60 * 1000);
+  return shifted.toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
 }
 
 export async function GET() {

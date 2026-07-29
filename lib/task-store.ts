@@ -31,7 +31,31 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function todayKey() {
-  return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
+  // يوم العمل في منظور يبدأ الساعة 8 صباحا بتوقيت الرياض.
+  // قبل الساعة 8 تعتبر المهام تابعة ليوم العمل السابق.
+  const shifted = new Date(Date.now() - 8 * 60 * 60 * 1000);
+  return shifted.toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
+}
+
+let archiveRequest: Promise<void> | null = null;
+
+export async function ensureDailyArchive(): Promise<void> {
+  if (typeof window === "undefined") return;
+  const workday = todayKey();
+  const storageKey = "manzor_archive_checked_workday";
+  if (localStorage.getItem(storageKey) === workday) return;
+  if (archiveRequest) return archiveRequest;
+
+  archiveRequest = fetch("/api/archive-daily", { method: "POST", cache: "no-store" })
+    .then(async (response) => {
+      if (!response.ok) throw new Error(await response.text());
+      localStorage.setItem(storageKey, workday);
+    })
+    .finally(() => {
+      archiveRequest = null;
+    });
+
+  return archiveRequest;
 }
 
 type TaskRow = {

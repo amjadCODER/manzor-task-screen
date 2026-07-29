@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { DashboardData, Employee, EmployeeTask } from "@/types/dashboard";
 import { getTopEmployee, getTotals } from "@/lib/dashboard";
-import { getTasks, todayKey } from "@/lib/task-store";
+import { ensureDailyArchive, getTasks, todayKey } from "@/lib/task-store";
 import { useDashboard } from "@/hooks/useDashboard";
 import { CompletedTasks } from "./CompletedTasks";
 import { CurrentTasks } from "./CurrentTasks";
@@ -23,6 +23,7 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
 
   const refreshAllTasks = useCallback(async () => {
     try {
+      await ensureDailyArchive();
       const tasks = await getTasks();
       setAllTasks(tasks.filter((task) => task.date === todayKey()));
     } catch (error) {
@@ -33,7 +34,7 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
   useEffect(() => {
     setActiveEmployeeId(localStorage.getItem("manzor_active_employee"));
     void refreshAllTasks();
-    const timer = window.setInterval(() => void refreshAllTasks(), 5000);
+    const timer = window.setInterval(() => void refreshAllTasks(), 10000);
     return () => window.clearInterval(timer);
   }, [refreshAllTasks]);
 
@@ -65,7 +66,7 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
   }
 
   return (
-    <main className="monitor-page soft-grid h-screen w-screen overflow-y-auto overflow-x-hidden p-2 text-white sm:p-3 xl:p-4" dir="rtl">
+    <main className="monitor-page soft-grid min-h-screen w-screen overflow-y-auto overflow-x-hidden p-2 pb-20 text-white sm:p-3 sm:pb-20 xl:p-4 xl:pb-20" dir="rtl">
       <section className="relative flex min-h-full w-full flex-col gap-3 overflow-visible rounded-[28px] border border-white/10 bg-[#040816]/75 p-3 shadow-[0_30px_120px_rgba(0,0,0,0.45)] sm:rounded-[42px] sm:p-4 xl:gap-4 xl:p-5">
         <div className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-cyan-400/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-48 -left-40 h-[34rem] w-[34rem] rounded-full bg-purple-500/25 blur-3xl" />
@@ -84,7 +85,7 @@ export function DashboardScreen({ initialData }: { initialData: DashboardData })
         </section>
         <FooterStats {...totals} />
         <div className="pointer-events-none absolute bottom-4 left-5 z-20 rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[10px] font-bold text-slate-300 backdrop-blur-xl sm:text-xs">
-          {isRefreshing ? "جاري التحديث..." : "تحديث مباشر كل 5 ثوان"}
+          {isRefreshing ? "جاري التحديث..." : "تحديث مباشر كل 10 ثوان"}
         </div>
       </section>
       {selected && <EmployeeTaskModal employee={selected} tasks={allTasks.filter((task) => task.employeeId === selected.id)} onClose={() => setSelected(null)} />}

@@ -127,12 +127,6 @@ select {
   background: linear-gradient(rgba(34, 211, 238, 0.55), rgba(124, 58, 237, 0.55));
 }
 
-@media (min-width: 1024px) and (min-height: 820px) {
-  .monitor-page {
-    overflow-y: hidden;
-  }
-}
-
 @media (max-height: 819px), (max-width: 1023px) {
   html,
   body {
@@ -141,7 +135,7 @@ select {
 
   .monitor-page {
     min-height: 100vh;
-    height: auto;
+    height: 100vh;
   }
 }
 
@@ -192,4 +186,15 @@ select {
     z-index: 20;
     box-shadow: 0 14px 35px rgba(0, 0, 0, 0.38);
   }
+}
+
+
+/* شاشة المتابعة تتمرر بالكامل حتى اخر بطاقة مهما كان مقاس الشاشة */
+.monitor-page {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scroll-padding-bottom: 5rem;
 }

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { employees } from "@/lib/dashboard";
-import { deletePlan, deleteTask, exportExcelSheet, getPlans, getTasks, savePlan, saveTask, todayKey, updateTaskStatus } from "@/lib/task-store";
+import { deletePlan, deleteTask, ensureDailyArchive, exportExcelSheet, getPlans, getTasks, savePlan, saveTask, todayKey, updateTaskStatus } from "@/lib/task-store";
 import type { EmployeePlan, EmployeeTask, PlanType, TaskPriority, TaskStatus } from "@/types/dashboard";
 
 const tabs: { key: "tasks" | PlanType; label: string }[] = [
@@ -37,6 +37,7 @@ export default function EmployeeWorkspace() {
   async function refresh() {
     if (!employee) return;
     try {
+      await ensureDailyArchive();
       const [nextTasks, nextPlans] = await Promise.all([
         getTasks(employee.id),
         getPlans(employee.id),
@@ -51,7 +52,7 @@ export default function EmployeeWorkspace() {
   useEffect(() => {
     if (employee) localStorage.setItem("manzor_active_employee", employee.id);
     void refresh();
-    const timer = window.setInterval(() => void refresh(), 5000);
+    const timer = window.setInterval(() => void refresh(), 10000);
     return () => window.clearInterval(timer);
   }, [employee?.id]);
 

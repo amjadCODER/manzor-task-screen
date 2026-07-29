@@ -21,7 +21,7 @@ export function useDashboard(initialData: DashboardData) {
 
   useEffect(() => {
     void refresh();
-    const timer = window.setInterval(() => void refresh(), 5000);
+    const timer = window.setInterval(() => void refresh(), 10000);
     const onVisible = () => {
       if (document.visibilityState === "visible") void refresh();
     };
