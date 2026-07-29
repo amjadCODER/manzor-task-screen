@@ -56,6 +56,7 @@ export default function EmployeeWorkspace() {
 
   function addTask(event: FormEvent) {
     event.preventDefault();
+    if (!employee) return;
     if (!taskTitle.trim()) return;
     saveTask({ id: crypto.randomUUID(), employeeId: employee.id, title: taskTitle.trim(), notes: taskNotes.trim(), priority, status: "pending", date: todayKey() });
     setTaskTitle(""); setTaskNotes(""); setPriority("متوسطة"); refresh();
