@@ -21,20 +21,21 @@ function formatTime(date: Date) {
 }
 
 export function LiveClock() {
-  const [now, setNow] = useState(new Date());
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
+    setNow(new Date());
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
   }, []);
 
   return (
-    <div className="text-left" dir="rtl">
+    <div className="min-w-[220px] text-left" dir="rtl" suppressHydrationWarning>
       <p className="text-3xl font-black leading-none tracking-tight text-white xl:text-5xl">
-        {formatTime(now)}
+        {now ? formatTime(now) : "--:--:--"}
       </p>
       <p className="mt-2 text-sm font-medium text-slate-300 xl:text-base">
-        {formatDate(now)}
+        {now ? formatDate(now) : "جاري تحميل الوقت"}
       </p>
     </div>
   );

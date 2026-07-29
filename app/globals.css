@@ -96,3 +96,13 @@ select {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .landscape-hint::after {
+    content: "لف الجوال بالعرض لعرض اوسع";
+  }
+}
+
+@media (max-height: 620px) and (orientation: landscape) {
+  html, body { overflow: auto; }
+}

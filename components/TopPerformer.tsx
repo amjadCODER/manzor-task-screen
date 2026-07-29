@@ -1,7 +1,18 @@
 import type { Employee } from "@/types/dashboard";
 import { getCompletionRate } from "@/lib/dashboard";
 
-export function TopPerformer({ employee }: { employee: Employee }) {
+export function TopPerformer({ employee }: { employee?: Employee }) {
+  if (!employee) {
+    return (
+      <section className="glass-panel rounded-[32px] p-5">
+        <p className="text-sm font-bold text-cyan-200">أسرع موظف اليوم</p>
+        <div className="mt-4 rounded-3xl border border-white/10 bg-white/[0.06] p-5 text-center text-sm text-slate-300">
+          لا توجد بيانات موظفين حاليا
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="glass-panel rounded-[32px] p-5">
       <p className="text-sm font-bold text-cyan-200">أسرع موظف اليوم</p>
