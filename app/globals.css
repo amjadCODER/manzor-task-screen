@@ -106,3 +106,51 @@ select {
 @media (max-height: 620px) and (orientation: landscape) {
   html, body { overflow: auto; }
 }
+
+/* شاشة المتابعة تسمح بالتمرير عند صغر الشاشة وتبقيه خفيفا */
+.monitor-page {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.45) rgba(255, 255, 255, 0.05);
+  overscroll-behavior-y: contain;
+}
+
+.monitor-page::-webkit-scrollbar {
+  width: 7px;
+}
+
+.monitor-page::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.monitor-page::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(rgba(34, 211, 238, 0.55), rgba(124, 58, 237, 0.55));
+}
+
+@media (min-width: 1024px) and (min-height: 820px) {
+  .monitor-page {
+    overflow-y: hidden;
+  }
+}
+
+@media (max-height: 819px), (max-width: 1023px) {
+  html,
+  body {
+    overflow-y: auto;
+  }
+
+  .monitor-page {
+    min-height: 100vh;
+    height: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .employee-progress-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .employee-progress-card {
+    min-height: 128px;
+  }
+}
